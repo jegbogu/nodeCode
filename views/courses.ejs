@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%-include('partials/head')%>
+
+<body>
+    <%-include('partials/navBar')%>
+    <h1>Courses Page</h1>
+    <h3><%=data.rand%></h3>
+    <h4> <%=data.rand<5?'Data is less than Five': 'data is Greater than Five'%></h4>
+
+
+                    
+                        <p>
+                            username: <%=data.username%>
+                        </p>
+
+                        <div>
+                            <h3>All Courses</h3>
+                            <% for( let index=0; index < data.allCourses.length; index++ ) { %>
+                                <ul>
+                                    <li>
+                                        <%=data.allCourses[index]%>
+                                    </li>
+                                </ul>
+
+                                <% } %>
+                        </div>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+body{
+    background-color: rgb(162, 159, 159);
+    padding: 30px;
+    margin: 0px;
+}
+*{
+    box-sizing: border-box;
+}
+button{
+    background: burlywood;
+}

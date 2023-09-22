@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<%-include('partials/head')%>
+<link rel="stylesheet" href="css/allUsers.css">
+<body>
+    <%-include('partials/navBar')%>
+     
+
+    <% users.forEach(element => { %>
+        <h3><%=element.name%></h3>  
+        <a href="/<%=element.username%>"> <button class="btn">View User</button></a>
+         <hr>
+    <% }) %>
+
+    <script src="js/allUsers.js"></script>
+     
+</body>
+</html>
