@@ -38,6 +38,9 @@
 
 <body style="padding: 100px;">
     <h1>Admin Dashboard</h1>
+    <form action="/logout" method="post">
+        <button>Logout</button>
+    </form>
     <table id="customers">
         <thead>
             <tr>
@@ -53,7 +56,7 @@
                     <td><%=element.username%></td>
                     <td><%=element.role%></td>
                     <td><%=element.active%></td>
-                    <td><a href=/<%=element._id%>><p>Delete</p></a> </td>
+                    <td><a href=delete/<%=element._id%>><p>Delete</p></a> </td>
                 </tr>
             <% }) %>
            

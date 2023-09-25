@@ -4,6 +4,7 @@ const path = require('path')
 const usersInfo = require('./data')
 const bcrypt =  require('bcrypt')
 const session = require('express-session')
+ const MongoDBStore = require('connect-mongodb-session')(session)
 const flash = require('connect-flash')
 const User = require('./model/registrationSchema')
 const Admin = require('./model/adminReg')
@@ -22,13 +23,25 @@ app.use(express.static(path.join(__dirname, 'public')))
 // console.log(users)
 
 
+const store = new MongoDBStore({
+    uri: 'mongodb://127.0.0.1:27017/db',
+    collection: 'mySessions'
+  });
+  // Catch errors
+ 
+ 
 //setup our flash with session
  app.use(session({
     secret: 'keyboard cat',
-    saveUninitialized:true,
-    resave: true
+    saveUninitialized:false,
+    resave: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+      },
+      store:store
  }))
  app.use(flash());
+  
 
 const rand = Math.floor(Math.random() * 10) + 1
 const username = 'josephDev'
@@ -38,13 +51,22 @@ const data = {
     username: username,
     rand: rand
 }
- 
+  
+const isAuth = (req,res,next)=>{
+    if(req.session.isAuth){
+        next()
+    }else{
+        res.redirect('/login')
+    }
+}
 
 app.get('/', (req, res) => {
-    res.render('index.ejs')   //5sec
+    res.render('index.ejs')   
+    console.log(req.sessionID)
 })
+ 
 
-app.get('/admindashboard', async(req, res) => {
+app.get('/admindashboard',isAuth, async(req, res) => {
     const allUsers = await User.find()
     console.log(allUsers)
     res.render('admindashboard.ejs',{allUsers})
@@ -141,7 +163,11 @@ app.post('/login',async (req,res)=>{
     if(foundUser){
             const user = await bcrypt.compare(password,foundUser.password)
             if(user){
+                req.session.user = foundUser;
+                req.session.isAuth = true
                 res.redirect('/dashboard')
+                console.log('data')
+                console.log( req.session.user)
             }else{
                 req.flash('info','Username or Password is Incorrect!')
                 res.redirect('/login') 
@@ -152,6 +178,7 @@ app.post('/login',async (req,res)=>{
         if(foundAdmin){
             const user = await bcrypt.compare(password,foundAdmin.password)
             if(user){
+                req.session.isAuth = true
                 res.redirect('/admindashboard')
             }else{
                 req.flash('info','Username or Password is Incorrect!')
@@ -193,13 +220,17 @@ app.post('/forgetpassword', async(req,res)=>{
 
 // })
 //deleting user by the admin
-app.get('/:id', async (req,res)=>{
+app.get('/delete/:id', async (req,res)=>{
     const{id} = req.params
     
     await User.findByIdAndDelete({_id:id})
     res.redirect('/admindashboard')
 })
 
+app.post('/logout',(req,res)=>{
+    req.session.destroy()
+    res.redirect('/login')
+})
 
 // app.get('/:username', (req, res) => {
 //     const { username } = req.params
